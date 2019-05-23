@@ -109,11 +109,12 @@ async function makeURL(withCredentials, title){
     let data = await dumpApplicationState(withCredentials, true);
 
     var bin_data = JSON.stringify(JSON.stringify(data));
-    var basename = location.protocol + '//' + location.host + location.pathname;
+    var base_url = location.protocol + '//' + location.host + location.pathname;
     return URL.createObjectURL(new Blob([
         require('raw-loader!./export_template.html')
             .replace("{{notebook_name}}", title)
             .replace("{{bin_data}}", bin_data)
+            .replace(/\{\{base_url\}\}/gi, base_url)
     ]))
 }
 
@@ -139,7 +140,7 @@ async function downloadNotebook(withCredentials){
 
         a.setAttribute('download', title.match(/.+\..+/) ? title : title + '.' + extension)
         a.setAttribute('href', await makeURL(withCredentials, title))
-        a.click()      
+        a.click()
 
         requestAnimationFrame(e => a.remove())
     } catch (e) {
